@@ -38,4 +38,37 @@ const getUsers = ({ response }: { response: any }) => {
   response.body = mockUsers;
 }
 
-export {getUsers};
+const getUser = ( {response, params}: { response: any, params: { id: string} } ) => {
+  const findUser = mockUsers.find( user => user.id === params.id);
+  if (findUser) {
+    response.status = 200;
+    response.body = findUser;
+  }
+}
+
+const updateUser = async ({ response, params, request }: { response: any, params: {id: string}, request: any }) => {
+  let findUser = mockUsers.find( user => user.id === params.id);
+  if (findUser) {
+    const body = await request.body();
+    const editUser: {
+      name?: string;
+      phone?: string;
+      ddd?: string;
+      state?: string;
+      city?: string;
+      ocupation?: string;
+      password?: string;
+      sendNewsletter?: boolean;
+    } = body.value;
+    findUser = { ...findUser, ... editUser, update_at: new Date() };
+    mockUsers = [... mockUsers.filter( user => user.id !== params.id), findUser];
+
+    response.status = 200;
+    response.body = { message: 'ok' };
+  } else {
+    response.status= 404;
+    response.body = { message: 'Content not found'};
+  }
+} 
+
+export {getUsers, updateUser, getUser};
